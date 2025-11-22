@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificación 2FA - Mr Burger</title>
+    <link rel="stylesheet" th:href="@{/css/auth.css}">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="brand-header">
+                <h1>🍔 Mr Burger</h1>
+                <p>Verificación de Dos Factores</p>
+            </div>
+            
+            <!-- Mensaje de error -->
+            <div th:if="${param.error}" class="alert alert-error">
+                ❌ Código inválido. Intenta nuevamente.
+            </div>
+            
+            <form th:action="@{/verify-2fa}" method="post" class="login-form">
+                <div class="form-group">
+                    <label for="code">Código de 6 dígitos</label>
+                    <input type="text" id="code" name="code" required 
+                           maxlength="6" pattern="[0-9]{6}"
+                           placeholder="123456" 
+                           title="Ingresa los 6 dígitos de Google Authenticator"
+                           class="code-input">
+                    <small class="form-text">Abre Google Authenticator e ingresa el código de 6 dígitos</small>
+                </div>
+                
+                <button type="submit" class="login-btn">Verificar y Continuar</button>
+            </form>
+            
+            <div class="login-footer">
+                <p>🔒 Protección de dos factores activada</p>
+                <a th:href="@{/logout}" class="logout-link">Cancelar y volver al login</a>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/verify-2fa.js}"></script>
+</body>
+</html>
