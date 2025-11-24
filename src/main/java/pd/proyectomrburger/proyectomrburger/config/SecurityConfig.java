@@ -56,7 +56,7 @@ public class SecurityConfig {
                 .logout(logout -> logout
                         .logoutSuccessUrl("/login?logout")
                         .permitAll())
-                .addFilterBefore(twoFactorAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); 
+               .addFilterBefore(twoFactorAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); 
 
         ;
 

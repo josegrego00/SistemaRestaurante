@@ -3,11 +3,14 @@ package pd.proyectomrburger.proyectomrburger.services;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
 import com.warrenstrange.googleauth.GoogleAuthenticatorQRGenerator;
+
+import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
 @Service
 public class TwoFactorService {
     private final GoogleAuthenticator gAuth = new GoogleAuthenticator();
+    Logger logger = org.slf4j.LoggerFactory.getLogger(TwoFactorService.class);
 
     // 🗝️ Generar clave secreta
     public String generarClaveSecreta() {
@@ -23,6 +26,7 @@ public class TwoFactorService {
 
     // ✅ Verificar código
     public boolean verificarCodigo(String secret, int codigo) {
+        
         return gAuth.authorize(secret, codigo);
     }
 
@@ -31,7 +35,7 @@ public class TwoFactorService {
         try {
             return gAuth.authorize(secret, codigo);
         } catch (Exception e) {
-            System.out.println("❌ Error verificando código 2FA: " + e.getMessage());
+            
             return false;
         }
     }

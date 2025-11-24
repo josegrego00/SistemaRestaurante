@@ -13,16 +13,18 @@ public class IngredienteRequestDTO {
     @NotBlank(message = "La unidad de medida no puede estar vacía")
     @Size(min = 2, message = "La unidad de medida tiene que ser algo Coherente")
     private String unidadMedida;
-    
+
     @NotNull(message = "El costo por unidad no puede ser nulo")
     @Min(value = 0, message = "El costo no puedes ser negativo")
     private Double costoUnidad;
 
     @NotNull(message = "El stock actual no puede ser nulo")
-    @Min(value =  0, message = "El stock actual no puede ser negativo")
+    @Min(value = 0, message = "El stock actual no puede ser negativo")
     private Double stockActual;
 
-    
+    private Double stockMinimo = 1.0;
+    private Boolean activo = true;
+
     public IngredienteRequestDTO() {
     }
 
@@ -35,6 +37,7 @@ public class IngredienteRequestDTO {
         this.unidadMedida = unidadMedida;
         this.costoUnidad = costoUnidad;
         this.stockActual = stockActual;
+
     }
 
     public String getNombreIngrediente() {
@@ -69,7 +72,20 @@ public class IngredienteRequestDTO {
         this.stockActual = stockActual;
     }
 
-    
+    public Double getStockMinimo() {
+        return stockMinimo;
+    }
 
-    
+    public void setStockMinimo(Double stockMinimo) {
+        this.stockMinimo = stockMinimo;
+    }
+
+    public Boolean getActivo() {
+        return activo;
+    }
+
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
+    }
+
 }
