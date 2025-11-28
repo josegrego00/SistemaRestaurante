@@ -1,65 +1,65 @@
 package pd.proyectomrburger.proyectomrburger.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import lombok.AllArgsConstructor;
+import pd.proyectomrburger.proyectomrburger.services.CustomUserDetailsService;
+
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
+@AllArgsConstructor
 public class SecurityConfig {
-    @Autowired
-    private TwoFactorAuthenticationFilter twoFactorAuthenticationFilter;
 
-    @Autowired
-    private TwoFactorAuthenticationSuccessHandler twoFactorAuthenticationSuccessHandler;
 
-    @Bean
-    public UserDetailsService userDetailsService() {
-        return new pd.proyectomrburger.proyectomrburger.services.CustomUserDetailsService();
+    private CustomUserDetailsService userDetailsServicesImp;
+
+
+    // esto es para configurar la seguridad
+        @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/login").permitAll()
+                        .requestMatchers("/css/**", "/js/**").permitAll()
+                        .anyRequest().authenticated() // Privadas
+                )
+                .formLogin(form -> form
+                        .loginPage("/login") // Tu página de login
+                        .defaultSuccessUrl("/home") // Después del login
+                );
+        return http.build();
     }
 
+    // esto es para autenticar al usuario
+     @Bean
+    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
+        AuthenticationManagerBuilder authenticationManagerBuilder = http
+                .getSharedObject(AuthenticationManagerBuilder.class);
+        authenticationManagerBuilder
+                .userDetailsService(userDetailsServicesImp)
+                .passwordEncoder(passwordEncoder());
+        return authenticationManagerBuilder.build();
+    }
+
+    // esto es para Encriptar la contraseña
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService());
-        authProvider.setPasswordEncoder(passwordEncoder());
-        return authProvider;
-    }
+   // public static void main(String[] args) {
+    //    System.out.println(new BCryptPasswordEncoder().encode("123"));
+   // }
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(csrf -> csrf.disable())
-                .authenticationProvider(authenticationProvider())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/css/**", "/js/**").permitAll()
-                        .requestMatchers("/login", "/verify-2fa", "/api/**").permitAll()
-                        .anyRequest().authenticated())
-                .formLogin(form -> form
-                        .loginPage("/login")
-                        .successHandler(twoFactorAuthenticationSuccessHandler)
-                        .failureUrl("/login?error=true")
-                        .permitAll())
-                .logout(logout -> logout
-                        .logoutSuccessUrl("/login?logout")
-                        .permitAll())
-               .addFilterBefore(twoFactorAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); 
-
-        ;
-
-        return http.build();
-    }
 }

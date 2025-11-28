@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
-import pd.proyectomrburger.proyectomrburger.mapper.IngredienteMapper;
+
 import pd.proyectomrburger.proyectomrburger.models.Ingrediente;
 import pd.proyectomrburger.proyectomrburger.models.requestDTO.IngredienteRequestDTO;
 import pd.proyectomrburger.proyectomrburger.models.responseDTO.IngredienteResponseDTO;
@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 @RequestMapping("/api")
 public class IngredienteController {
 
-    private final IngredienteService ingredienteService;
-    private final IngredienteMapper ingredienteMapper;
+    //private final IngredienteService ingredienteService;
+  /*  private final IngredienteMapper ingredienteMapper;
 
     @Autowired
     public IngredienteController(IngredienteService ingredienteService, IngredienteMapper ingredienteMapper) {
@@ -39,5 +39,5 @@ public class IngredienteController {
         return ResponseEntity.ok().build();
 
     }
-
+ */
 }

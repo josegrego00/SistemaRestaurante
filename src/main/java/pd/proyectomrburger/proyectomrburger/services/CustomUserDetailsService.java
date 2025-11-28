@@ -1,25 +1,36 @@
 package pd.proyectomrburger.proyectomrburger.services;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
 
-import pd.proyectomrburger.proyectomrburger.config.CustomUserDetails;
-import pd.proyectomrburger.proyectomrburger.models.User;
-import pd.proyectomrburger.proyectomrburger.repositories.UserRepository;
+import pd.proyectomrburger.proyectomrburger.models.UserEntity;
+import pd.proyectomrburger.proyectomrburger.repositories.UserEntityRepository;
 
+
+@Service
 public class CustomUserDetailsService implements UserDetailsService {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserEntityRepository userRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
-        // 2. Convierte tu User Entity a UserDetails
-        return new CustomUserDetails(user); // ← El que acabamos de crear
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("El Usuario " + username + " no se Encontro"));
+        return User.builder()
+                .username(user.getUsername())
+                .password(user.getPassword())
+                .roles(user.getRoles())
+                .disabled(!user.isEnabled())
+                .build();
     }
 
 }
