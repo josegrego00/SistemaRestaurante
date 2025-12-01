@@ -6,16 +6,17 @@ import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
 
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import pd.proyectomrburger.proyectomrburger.models.UserEntity;
 import pd.proyectomrburger.proyectomrburger.models.requestDTO.UserRequestDTO;
 import pd.proyectomrburger.proyectomrburger.repositories.UserEntityRepository;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserEntityService {
 
     private GoogleAuthenticator gAuth = new GoogleAuthenticator();
-    private UserEntityRepository userEntityRepository;
+    private final UserEntityRepository userEntityRepository;
 
     // creaccion de secretKey
     public String generarSecretkey() {

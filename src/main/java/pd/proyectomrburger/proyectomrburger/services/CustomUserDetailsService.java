@@ -11,14 +11,14 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import lombok.AllArgsConstructor;
 import pd.proyectomrburger.proyectomrburger.models.UserEntity;
 import pd.proyectomrburger.proyectomrburger.repositories.UserEntityRepository;
 
-
 @Service
+@AllArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 
-    @Autowired
     private UserEntityRepository userRepository;
 
     @Override

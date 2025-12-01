@@ -26,8 +26,7 @@ public class UserRequestDTO {
     private String password;
     @NotBlank
     private String role;
-    
+
     private int code;
-    
 
 }
