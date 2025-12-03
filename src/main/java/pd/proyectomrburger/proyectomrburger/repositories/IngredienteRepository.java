@@ -10,6 +10,5 @@ public interface IngredienteRepository extends JpaRepository<Ingrediente, Long>{
 
     List<Ingrediente> findByUnidadMedida(String unidadMedida);
 
-
     
 }

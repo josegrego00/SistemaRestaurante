@@ -40,6 +40,7 @@ public class Ingrediente {
     @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
     private Boolean activo=true;
 
+    
 
 
 }

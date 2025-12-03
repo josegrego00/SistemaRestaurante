@@ -14,6 +14,6 @@ public class AuthController {
 
     @GetMapping("/home")
     public String showDashboard() {
-        return "dashboard"; // Página después del login
+        return "redirect:/dashboard"; // Página después del login
     }
 }

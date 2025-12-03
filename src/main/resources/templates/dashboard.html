@@ -1,73 +1,51 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dashboard - Mr Burger</title>
-    <link rel="stylesheet" th:href="@{/css/dashboard.css}" />
-  </head>
-  <body>
+<head th:replace="~{componentes/head :: head('Dashboard - Mr Burger')}">
+    <!-- Head será reemplazado por el fragmento -->
+</head>
+
+<body>
     <div class="dashboard-container">
-      <!-- Sidebar -->
-      <div class="sidebar">
-        <div class="sidebar-header">
-          <h2>🍔 Mr Burger</h2>
-          <p>Sistema de Gestión</p>
-        </div>
+        <!-- Sidebar -->
+        <div th:replace="~{componentes/sidebar :: sidebar('dashboard')}"></div>
 
-        <nav class="sidebar-nav">
-          <a href="#" class="nav-item active">📊 Dashboard</a>
-          <a href="#" class="nav-item">📝 Pedidos</a>
-          <a href="#" class="nav-item">🍔 Menú</a>
-          <a href="#" class="nav-item">📦 Inventario</a>
-          <a href="#" class="nav-item">💰 Ventas</a>
-        </nav>
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <div th:replace="~{componentes/topbar :: topbar('Dashboard Principal')}"></div>
 
-        <div class="sidebar-footer">
-          <form th:action="@{/logout}" method="post">
-            <button type="submit" class="logout-btn">🚪 Cerrar Sesión</button>
-          </form>
-        </div>
-      </div>
+            <div class="content">
+                <!-- Cards de Métricas -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-icon">📝</div>
+                        <div class="metric-info">
+                            <h3>Pedidos Hoy</h3>
+                            <span class="metric-value">15</span>
+                        </div>
+                    </div>
 
-      <!-- Main Content -->
-      <div class="main-content">
-        <header class="top-bar">
-          <h1>Dashboard Principal</h1>
-          <div class="user-info">
-            <span>Bienvenido, <strong>Admin</strong></span>
-          </div>
-        </header>
+                    <div class="metric-card">
+                        <div class="metric-icon">💰</div>
+                        <div class="metric-info">
+                            <h3>Ventas Hoy</h3>
+                            <span class="metric-value">$450.000</span>
+                        </div>
+                    </div>
+                </div>
 
-        <div class="content">
-          <!-- Cards de Métricas -->
-          <div class="metrics-grid">
-            <div class="metric-card">
-              <div class="metric-icon">📝</div>
-              <div class="metric-info">
-                <h3>Pedidos Hoy</h3>
-                <span class="metric-value">15</span>
-              </div>
+                <div class="quick-actions">
+                    <h2>Acciones Rápidas</h2>
+                    <div class="actions-grid">
+                        <button class="action-btn">➕ Nuevo Pedido</button>
+                        <button class="action-btn">🍔 Gestionar Menú</button>
+                    </div>
+                </div>
             </div>
-
-            <div class="metric-card">
-              <div class="metric-icon">💰</div>
-              <div class="metric-info">
-                <h3>Ventas Hoy</h3>
-                <span class="metric-value">$450.000</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="quick-actions">
-            <h2>Acciones Rápidas</h2>
-            <div class="actions-grid">
-              <button class="action-btn">➕ Nuevo Pedido</button>
-              <button class="action-btn">🍔 Gestionar Menú</button>
-            </div>
-          </div>
         </div>
-      </div>
     </div>
-  </body>
+
+    <!-- Scripts -->
+    <th:block th:replace="~{componentes/scripts :: scripts(null)}"></th:block>
+</body>
 </html>

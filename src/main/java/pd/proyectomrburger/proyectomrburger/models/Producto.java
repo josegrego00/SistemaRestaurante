@@ -23,10 +23,10 @@ public class Producto {
     private Long Id;
     private String nombre;
     private double precioVenta;
-    private boolean tieneReceta;
+    private boolean tieneReceta= false;
       
     @ManyToOne
-    @JoinColumn(name = "receta_id")
+    @JoinColumn(name = "receta_id", nullable = true)
     private Receta receta;  // ✅ Relación directa
     
 

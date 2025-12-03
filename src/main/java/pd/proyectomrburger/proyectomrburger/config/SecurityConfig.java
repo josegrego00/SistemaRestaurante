@@ -31,12 +31,12 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login").permitAll()
-                        .requestMatchers("/css/**", "/js/**").permitAll()
+                        .requestMatchers("/css/**", "/js/**", "/componentes/**").permitAll()
                         .anyRequest().authenticated() // Privadas
                 )
                 .formLogin(form -> form
                         .loginPage("/login") // Tu página de login
-                        .defaultSuccessUrl("/home") // Después del login
+                        .defaultSuccessUrl("/dashboard") // Después del login
                 );
         return http.build();
     }
@@ -58,8 +58,8 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    public static void main(String[] args) {
+ /*   public static void main(String[] args) {
        System.out.println(new BCryptPasswordEncoder().encode("123"));
     }
-
+ */
 }

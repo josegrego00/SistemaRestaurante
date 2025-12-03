@@ -6,7 +6,8 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import lombok.AllArgsConstructor;
-
+import pd.proyectomrburger.proyectomrburger.exceptions.IngredienteNotFoundException;
+import pd.proyectomrburger.proyectomrburger.exceptions.NoIngredientesDisponiblesException;
 import pd.proyectomrburger.proyectomrburger.models.Ingrediente;
 import pd.proyectomrburger.proyectomrburger.models.requestDTO.IngredienteRequestDTO;
 import pd.proyectomrburger.proyectomrburger.repositories.IngredienteRepository;
@@ -23,40 +24,42 @@ public class IngredienteService {
     }
 
     public List<Ingrediente> listarTodos() {
-        return ingredienteRepository.findAll();
+        List<Ingrediente> ingredientesLista = ingredienteRepository.findAll();
+        if (ingredientesLista.isEmpty()) {
+            throw new NoIngredientesDisponiblesException(
+                    "El sistema no tiene ingredientes registrados. Por favor, agregue al menos uno.");
+        }
+        return ingredientesLista.stream()
+                .filter(Ingrediente::getActivo)
+                .toList();
     }
 
-    public Optional<Ingrediente> buscarPorId(Long id) {
-        return ingredienteRepository.findById(id);
-
+    public Ingrediente buscarPorId(Long id) {
+        return ingredienteRepository.findById(id)
+                .orElseThrow(() -> new IngredienteNotFoundException(id));
     }
 
     public List<Ingrediente> buscarPorUnidadMedida(String unidadMedida) {
         return ingredienteRepository.findByUnidadMedida(unidadMedida);
     }
 
-    public Ingrediente actualizar(Long id, IngredienteRequestDTO requestDTO) {
+    public Ingrediente actualizar(Long id, Ingrediente ingredienteNuevo) {
 
-        Optional<Ingrediente> ingreOptional = buscarPorId(id);
-        Ingrediente ingrediente = ingreOptional.get();
-        // Actualizar campos
-        ingrediente.setNombreIngrediente(requestDTO.getNombreIngrediente());
-        ingrediente.setUnidadMedida(requestDTO.getUnidadMedida());
-        ingrediente.setCostoUnidad(requestDTO.getCostoUnidad());
-        ingrediente.setStockActual(requestDTO.getStockActual());
-        ingrediente.setStockMinimo(requestDTO.getStockMinimo());
-        ingrediente.setActivo(requestDTO.getActivo());
+        Ingrediente ingrediente = buscarPorId(id);
 
+        ingrediente.setNombreIngrediente(ingredienteNuevo.getNombreIngrediente());
+        ingrediente.setUnidadMedida(ingredienteNuevo.getUnidadMedida());
+        ingrediente.setCostoUnidad(ingredienteNuevo.getCostoUnidad());
+        ingrediente.setStockActual(ingredienteNuevo.getStockActual());
+        ingrediente.setStockMinimo(ingredienteNuevo.getStockMinimo());
+        ingrediente.setActivo(ingredienteNuevo.getActivo());
         return ingredienteRepository.save(ingrediente);
     }
 
     public void desactivar(Long id) {
-        Optional<Ingrediente> ingreOptional = buscarPorId(id);
-        Ingrediente ingrediente = ingreOptional.get();
+        Ingrediente ingrediente = buscarPorId(id);
         ingrediente.setActivo(false);
         ingredienteRepository.save(ingrediente);
     }
-
-    
 
 }

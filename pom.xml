@@ -96,7 +96,10 @@
         	<artifactId>mapstruct-processor</artifactId>
        		<version>1.6.3</version>
     	</dependency>
-	
+    	<!-- OpenApi Swagger, para documentar -->	
+			<!-- la quite pero debe ir aqui -->	
+	 
+
 	</dependencies>
 
 
