@@ -12,4 +12,5 @@ public interface IngredienteMapper {
     IngredientesResponseDTO toResponseDTO(Ingrediente ingrediente);
     Ingrediente toIngrediente(IngredienteRequestDTO requestDTO);
 
+    //IngredienteRequestDTO toRequestDTO(Ingrediente ingrediente);
 }

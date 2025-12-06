@@ -73,13 +73,24 @@ public class InventarioViewController {
     // Procesar la actualización
     @PostMapping("/actualizar/{id}")
     public String actualizarIngrediente(@PathVariable Long id,
-            @ModelAttribute IngredienteRequestDTO request) {
+            @ModelAttribute IngredienteRequestDTO requestDTO) {
 
         // Convertir DTO a Entity
-        Ingrediente ingredienteActualizado = ingredienteMapper.toIngrediente(request);
+        Ingrediente ingredienteActualizado = ingredienteMapper.toIngrediente(requestDTO);
+        ingredienteService.actualizar(id,ingredienteActualizado);
+        return "redirect:/inventario";
+    }
 
-        ingredienteService.actualizar(id, ingredienteActualizado);
+    @GetMapping("/eliminar/{id}")
+    public String eliminarIngrediente(@PathVariable Long id) {
+        // esto no elimina al ingrediente simplemente lo desactiva
+        ingredienteService.desactivar(id);
+        return "redirect:/inventario";
+    }
 
+    @GetMapping("/reactivar/{id}")
+    public String reactivarIngrediente(@PathVariable Long id) {
+        ingredienteService.reactivar(id);
         return "redirect:/inventario";
     }
 }

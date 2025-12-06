@@ -43,22 +43,22 @@ public class IngredienteService {
         return ingredienteRepository.findByUnidadMedida(unidadMedida);
     }
 
-    public Ingrediente actualizar(Long id, Ingrediente ingredienteNuevo) {
+    public Ingrediente actualizar(Long id, Ingrediente ingredienteN) {
 
         Ingrediente ingrediente = buscarPorId(id);
-
-        ingrediente.setNombreIngrediente(ingredienteNuevo.getNombreIngrediente());
-        ingrediente.setUnidadMedida(ingredienteNuevo.getUnidadMedida());
-        ingrediente.setCostoUnidad(ingredienteNuevo.getCostoUnidad());
-        ingrediente.setStockActual(ingredienteNuevo.getStockActual());
-        ingrediente.setStockMinimo(ingredienteNuevo.getStockMinimo());
-        ingrediente.setActivo(ingredienteNuevo.getActivo());
+        ingrediente.setNombreIngrediente(ingredienteN.getNombreIngrediente());
         return ingredienteRepository.save(ingrediente);
     }
 
     public void desactivar(Long id) {
         Ingrediente ingrediente = buscarPorId(id);
         ingrediente.setActivo(false);
+        ingredienteRepository.save(ingrediente);
+    }
+
+    public void reactivar(Long id) {
+        Ingrediente ingrediente = buscarPorId(id);
+        ingrediente.setActivo(true);
         ingredienteRepository.save(ingrediente);
     }
 

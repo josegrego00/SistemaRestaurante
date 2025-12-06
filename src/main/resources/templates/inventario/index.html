@@ -1,70 +1,91 @@
 <!-- SOLO contenido -->
 <div>
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0">📦 Ingredientes</h2>
-        <a th:href="@{/inventario/crear}" class="btn btn-primary">
-            <i class="fas fa-plus me-2"></i>Nuevo Ingrediente
-        </a>
-    </div>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">📦 Ingredientes</h2>
+    <a th:href="@{/inventario/crear}" class="btn btn-primary">
+      <i class="fas fa-plus me-2"></i>Nuevo Ingrediente
+    </a>
+  </div>
 
-    <!-- Tabla -->
-    <div class="card">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>ID</th>
-                            <th>Nombre</th>
-                            <th>Unidad</th>
-                            <th>Stock</th>
-                            <th>Mínimo</th>
-                            <th>Precio</th>
-                            <th>Estado</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="ing : ${ingredientes}">
-                            <td th:text="${ing.id}">1</td>
-                            <td th:text="${ing.nombreIngrediente}">Pan</td>
-                            <td th:text="${ing.unidadMedida}">unidad</td>
-                            <td th:text="${ing.stockActual}">100</td>
-                            <td th:text="${ing.stockMinimo}">20</td>
-                            <td th:text="${'$' + #numbers.formatDecimal(ing.costoUnidad, 1, 2)}">
-                                $1.50
-                            </td>
-                            <td>
-                                <span th:if="${ing.activo}" class="badge bg-success">Activo</span>
-                                <span th:unless="${ing.activo}" class="badge bg-danger">Inactivo</span>
-                            </td>
-                            <td>
-                                <!-- CORREGIDO: Solo un botón de editar -->
-                                <a th:href="@{/inventario/editar/{id}(id=${ing.id})}" 
-                                   class="btn btn-warning btn-sm me-1">
-                                    <i class="fas fa-edit me-1"></i>Editar
-                                </a>
-                                
-                                <!-- Botón para eliminar/desactivar -->
-                                <button type="button" 
-                                        class="btn btn-danger btn-sm"
-                                        onclick="confirmarEliminacion(${ing.id})">
-                                    <i class="fas fa-trash me-1"></i>Eliminar
-                                </button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+  <!-- Tabla -->
+  <div class="card">
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead class="table-dark">
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Unidad</th>
+              <th>Stock</th>
+              <th>Mínimo</th>
+              <th>Precio</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="ing : ${ingredientes}">
+              <td th:text="${ing.id}">1</td>
+              <td th:text="${ing.nombreIngrediente}">Pan</td>
+              <td th:text="${ing.unidadMedida}">unidad</td>
+              <td th:text="${ing.stockActual}">100</td>
+              <td th:text="${ing.stockMinimo}">20</td>
+              <td
+                th:text="${'$' + #numbers.formatDecimal(ing.costoUnidad, 1, 2)}"
+              >
+                $1.50
+              </td>
+              <td>
+                <span th:if="${ing.activo}" class="badge bg-success"
+                  >Activo</span
+                >
+                <span th:unless="${ing.activo}" class="badge bg-danger"
+                  >Inactivo</span
+                >
+              </td>
+              <td>
+                <!-- Botón Editar (SIEMPRE visible) -->
+                <a
+                  th:href="@{/inventario/editar/{id}(id=${ing.id})}"
+                  class="btn btn-warning btn-sm me-2"
+                >
+                  <i class="fas fa-edit"></i>
+                </a>
+
+                <!-- Botón Eliminar (SOLO si activo=true) -->
+                <a
+                  th:if="${ing.activo}"
+                  th:href="@{/inventario/eliminar/{id}(id=${ing.id})}"
+                  class="btn btn-danger btn-sm me-2"
+                  onclick="return confirm('¿Desactivar este ingrediente?')"
+                >
+                  <i class="fas fa-trash"></i>
+                </a>
+
+                <!-- Botón Reactivar (SOLO si activo=false) -->
+                <a
+                  th:unless="${ing.activo}"
+                  th:href="@{/inventario/reactivar/{id}(id=${ing.id})}"
+                  class="btn btn-success btn-sm"
+                  onclick="return confirm('¿Reactivar este ingrediente?')"
+                >
+                  <i class="fas fa-check"></i>
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
+  </div>
 </div>
 
 <!-- Script para confirmar eliminación -->
 <script th:inline="javascript">
-    function confirmarEliminacion(id) {
-        if (confirm('¿Estás seguro de que deseas desactivar este ingrediente?')) {
-            window.location.href = '/inventario/eliminar/' + id;
-        }
+  function confirmarEliminacion(id) {
+    if (confirm("¿Estás seguro de que deseas desactivar este ingrediente?")) {
+      window.location.href = "/inventario/eliminar/" + id;
     }
+  }
 </script>

@@ -1,66 +1,125 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<body th:fragment="content">
+  <body th:fragment="content">
     <div class="container mt-4">
-        <div class="card">
-            <div class="card-header bg-primary text-white">
-                <h4 th:text="${titulo}"></h4>
-            </div>
-            <div class="card-body">
-                <form th:action="@{/inventario/actualizar/{id}(id=${ingrediente.id})}" 
-                      method="post" 
-                      th:object="${ingredienteRequest}">
-                    
-                    <!-- Campo oculto para ID si lo necesitas -->
-                    <input type="hidden" th:field="*{id}" th:value="${ingrediente.id}">
-                    
-                    <div class="mb-3">
-                        <label class="form-label">Nombre del Ingrediente</label>
-                        <input type="text" class="form-control" 
-                               th:field="*{nombreIngrediente}" 
-                               th:value="${ingrediente.nombreIngrediente}">
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label">Unidad de Medida</label>
-                        <input type="text" class="form-control" 
-                               th:field="*{unidadMedida}" 
-                               th:value="${ingrediente.unidadMedida}">
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label">Costo por Unidad</label>
-                        <input type="number" step="0.01" class="form-control" 
-                               th:field="*{costoUnidad}" 
-                               th:value="${ingrediente.costoUnidad}">
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label">Stock Actual</label>
-                        <input type="number" step="0.01" class="form-control" 
-                               th:field="*{stockActual}" 
-                               th:value="${ingrediente.stockActual}">
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label">Stock Mínimo</label>
-                        <input type="number" step="0.01" class="form-control" 
-                               th:field="*{stockMinimo}" 
-                               th:value="${ingrediente.stockMinimo}">
-                    </div>
-                    
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" 
-                               th:field="*{activo}" 
-                               th:checked="${ingrediente.activo}">
-                        <label class="form-check-label">Activo</label>
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-                    <a th:href="@{/inventario}" class="btn btn-secondary">Cancelar</a>
-                </form>
-            </div>
+      <div class="card">
+        <div class="card-header bg-warning text-white">
+          <h4>✏️ Editar Ingrediente</h4>
         </div>
+        <div class="card-body">
+          <form
+            th:action="@{/inventario/actualizar/{id}(id=${ingrediente.id})}"
+            method="post"
+            th:object="${ingredienteRequest}"
+          
+            >
+            <!-- Solo el campo nombre es editable -->
+            <div class="mb-3">
+              <label class="form-label">Nombre del Ingrediente *</label>
+              <input
+                type="text"
+                class="form-control"
+                th:value="${ingrediente.nombreIngrediente}"
+                th:field="*{nombreIngrediente}"  
+                
+                required
+              />
+            </div>
+
+            <!-- Campos SOLO LECTURA -->
+            <div class="mb-3">
+              <label class="form-label">Unidad de Medida</label>
+              <input
+                type="text"
+                class="form-control"
+                th:value="${ingrediente.unidadMedida}"
+                readonly
+              />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Costo por Unidad</label>
+              <input
+                type="text"
+                class="form-control"
+                th:value="${'$' + #numbers.formatDecimal(ingrediente.costoUnidad, 1, 2)}"
+                readonly
+              />
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Stock Actual</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    th:value="${ingrediente.stockActual}"
+                    readonly
+                  />
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Stock Mínimo</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    th:value="${ingrediente.stockMinimo}"
+                    readonly
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Estado</label>
+              <div>
+                <span th:if="${ingrediente.activo}" class="badge bg-success"
+                  >Activo</span
+                >
+                <span th:unless="${ingrediente.activo}" class="badge bg-danger"
+                  >Inactivo</span
+                >
+              </div>
+            </div>
+
+            <!-- Campos ocultos para mantener los otros valores -->
+            <input
+              type="hidden"
+              th:field="*{unidadMedida}"
+              th:value="${ingrediente.unidadMedida}"
+            />
+            <input
+              type="hidden"
+              th:field="*{costoUnidad}"
+              th:value="${ingrediente.costoUnidad}"
+            />
+            <input
+              type="hidden"
+              th:field="*{stockActual}"
+              th:value="${ingrediente.stockActual}"
+            />
+            <input
+              type="hidden"
+              th:field="*{stockMinimo}"
+              th:value="${ingrediente.stockMinimo}"
+            />
+            <input
+              type="hidden"
+              th:field="*{activo}"
+              th:value="${ingrediente.activo}"
+            />
+
+            <button type="submit" class="btn btn-warning">
+              Guardar Cambios
+            </button>
+            <a th:href="@{/inventario}" class="btn btn-secondary ms-2"
+              >Cancelar</a
+            >
+          </form>
+        </div>
+      </div>
     </div>
-</body>
+  </body>
 </html>
