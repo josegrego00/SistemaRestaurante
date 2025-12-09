@@ -21,14 +21,13 @@
             <!-- NO uses receta.ingredientes.size() -->
             <tr th:each="receta : ${recetas}">
               <td th:text="${receta.id}">1</td>
-              <td th:text="${receta.nombre}">Hamburguesa Clásica</td>
-                Receta principal
+              <td th:text="${receta.nombre}"></td>
               </td>
               <td>
-                <button class="btn btn-sm btn-info me-2">
+                <button class="btn btn-sm btn-info me-2">Ver Receta
                   <i class="fas fa-eye"></i>
                 </button>
-                <button class="btn btn-sm btn-warning">
+                <button class="btn btn-sm btn-warning">Editar Receta
                   <i class="fas fa-edit"></i>
                 </button>
               </td>

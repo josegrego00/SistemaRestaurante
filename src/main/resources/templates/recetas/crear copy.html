@@ -1,0 +1,329 @@
+<!-- SOLO contenido -->
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">
+      <i class="fas fa-utensils me-2 text-primary"></i>Nueva Receta
+    </h2>
+    <a th:href="@{/recetas}" class="btn btn-outline-secondary">
+      <i class="fas fa-arrow-left me-2"></i>Volver al Listado
+    </a>
+  </div>
+
+  <div class="card shadow">
+    <div class="card-body">
+      <form
+        th:action="@{/recetas/guardar}"
+        method="post"
+        th:object="${recetaRequest}"
+        id="formReceta"
+      >
+        <!-- Nombre y Descripción -->
+        <div class="row mb-4">
+          <div class="col-md-6">
+            <label for="nombre" class="form-label fw-bold">Nombre *</label>
+            <input
+              type="text"
+              class="form-control"
+              id="nombre"
+              th:field="*{nombre}"
+              placeholder="Nombre de la receta"
+              required
+            />
+          </div>
+          <div class="col-md-6">
+            <label for="descripcion" class="form-label fw-bold"
+              >Descripción</label
+            >
+            <!-- CAMBIA type="hidden" por type="text" -->
+            <input
+              type="text"
+              name="descripcion"
+              class="form-control"
+              id="descripcion"
+              th:field="*{descripcion}"
+              placeholder="Breve descripción"
+            />
+          </div>
+        </div>
+        <!-- Agregar Ingrediente - Minimalista -->
+        <div class="card mb-4">
+          <div class="card-header bg-light">
+            <h6 class="mb-0">Agregar Ingrediente</h6>
+          </div>
+          <div class="card-body">
+            <div class="row g-2">
+              <div class="col-md-5">
+                <select
+                  class="form-select form-select-sm"
+                  id="selectIngrediente"
+                >
+                  <option value="">Seleccionar ingrediente...</option>
+                  <option
+                    th:each="ing : ${ingredientes}"
+                    th:value="${ing.id}"
+                    th:text="${ing.nombreIngrediente}"
+                  ></option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0.01"
+                  class="form-control form-control-sm"
+                  id="inputCantidad"
+                  placeholder="Cantidad"
+                />
+              </div>
+              <div class="col-md-2">
+                <span class="form-control-plaintext" id="spanUnidad"
+                  >unidades</span
+                >
+              </div>
+              <div class="col-md-2">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-primary w-100"
+                  onclick="agregarIngredienteATabla()"
+                >
+                  Agregar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabla Minimalista -->
+        <div class="mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="mb-0">Ingredientes Agregados</h6>
+            <span class="badge bg-secondary" id="contador-ingredientes">0</span>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-sm table-hover">
+              <thead>
+                <tr>
+                  <th width="5%">#</th>
+                  <th>Ingrediente</th>
+                  <th width="15%">Cantidad</th>
+                  <th width="10%">Acción</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyIngredientes">
+                <tr id="filaVacia">
+                  <td colspan="4" class="text-center text-muted py-3">
+                    No hay ingredientes agregados
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <!-- AQUÍ AGREGA ESTO -->
+        <div id="hiddenFieldsContainer">
+          <!-- Campos ocultos se generan aquí -->
+        </div>
+        <!-- Botones -->
+        <div class="d-flex justify-content-between pt-3 border-top">
+          <a th:href="@{/recetas}" class="btn btn-outline-secondary">
+            Cancelar
+          </a>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            disabled
+            id="btnGuardar"
+          >
+            Guardar Receta
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+  console.log("✅ JavaScript de recetas cargado");
+  let ingredientesAgregados = [];
+  let contadorIndex = 0;
+
+  // Actualizar unidad al seleccionar ingrediente
+  document
+    .getElementById("selectIngrediente")
+    .addEventListener("change", function () {
+      const selectedOption = this.options[this.selectedIndex];
+      const texto = selectedOption.textContent || "";
+      const unidadMatch = texto.match(/\((.*?)\)/);
+      document.getElementById("spanUnidad").textContent = unidadMatch
+        ? unidadMatch[1]
+        : "unidades";
+    });
+
+  function agregarIngredienteATabla() {
+    const select = document.getElementById("selectIngrediente");
+    const inputCantidad = document.getElementById("inputCantidad");
+
+    // Validaciones básicas
+    if (!select.value) {
+      alert("Seleccione un ingrediente");
+      select.focus();
+      return;
+    }
+
+    if (!inputCantidad.value || parseFloat(inputCantidad.value) <= 0) {
+      alert("Ingrese una cantidad válida");
+      inputCantidad.focus();
+      return;
+    }
+
+    // Obtener datos
+    const ingredienteId = select.value;
+    const ingredienteNombre = select.options[select.selectedIndex].textContent;
+    const cantidad = parseFloat(inputCantidad.value);
+
+    // Verificar si ya existe
+    const existe = ingredientesAgregados.find(
+      (ing) => ing.id === ingredienteId
+    );
+    if (existe) {
+      if (!confirm("¿Actualizar cantidad del ingrediente existente?")) {
+        return;
+      }
+      existe.cantidad = cantidad;
+    } else {
+      // Agregar nuevo
+      const ingrediente = {
+        index: contadorIndex++,
+        id: ingredienteId,
+        nombre: ingredienteNombre,
+        cantidad: cantidad,
+      };
+      ingredientesAgregados.push(ingrediente);
+    }
+
+    // Actualizar tabla y campos ocultos
+    actualizarTabla();
+    actualizarCamposOcultos();
+
+    // Limpiar formulario
+    select.value = "";
+    inputCantidad.value = "";
+    document.getElementById("spanUnidad").textContent = "unidades";
+  }
+
+  function eliminarIngrediente(index) {
+    if (confirm("¿Eliminar este ingrediente?")) {
+      ingredientesAgregados = ingredientesAgregados.filter(
+        (ing) => ing.index !== index
+      );
+      actualizarTabla();
+      actualizarCamposOcultos();
+    }
+  }
+
+  function actualizarTabla() {
+    const tbody = document.getElementById("tbodyIngredientes");
+    const filaVacia = document.getElementById("filaVacia");
+    const contador = document.getElementById("contador-ingredientes");
+    const btnGuardar = document.getElementById("btnGuardar");
+
+    // Actualizar contador
+    contador.textContent = ingredientesAgregados.length;
+    btnGuardar.disabled = ingredientesAgregados.length === 0;
+
+    // Limpiar tabla
+    tbody.innerHTML = "";
+
+    if (ingredientesAgregados.length === 0) {
+      tbody.appendChild(filaVacia);
+    } else {
+      // Generar filas
+      ingredientesAgregados.forEach((ing, i) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${i + 1}</td>
+          <td>${ing.nombre}</td>
+          <td>${ing.cantidad}</td>
+          <td>
+            <button 
+              type="button" 
+              class="btn btn-sm btn-outline-danger"
+              onclick="eliminarIngrediente(${ing.index})"
+            >
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    console.log("Ingredientes en tabla:", ingredientesAgregados);
+  }
+
+  function actualizarCamposOcultos() {
+    const container = document.getElementById("hiddenFieldsContainer");
+    if (!container) return;
+
+    // Limpiar contenedor
+    container.innerHTML = "";
+
+    // Agregar campos ocultos para cada ingrediente
+    ingredientesAgregados.forEach((ing, index) => {
+      // Campo para ingredienteId
+      const inputId = document.createElement("input");
+      inputId.type = "hidden";
+      inputId.name = `ingredientes[${index}].ingredienteId`;
+      inputId.value = ing.id;
+      container.appendChild(inputId);
+
+      // Campo para cantidadNecesaria
+      const inputCantidad = document.createElement("input");
+      inputCantidad.type = "hidden";
+      inputCantidad.name = `ingredientes[${index}].cantidadNecesaria`;
+      inputCantidad.value = ing.cantidad;
+      container.appendChild(inputCantidad);
+    });
+
+    console.log("Campos ocultos generados:", container.innerHTML);
+  }
+
+  // Validar antes de enviar
+  document
+    .getElementById("formReceta")
+    .addEventListener("submit", function (e) {
+      const nombre = document.getElementById("nombre").value;
+
+      // Validar nombre
+      if (!nombre || nombre.trim() === "") {
+        e.preventDefault();
+        alert("El nombre de la receta es obligatorio");
+        document.getElementById("nombre").focus();
+        return false;
+      }
+
+      // Validar ingredientes
+      if (ingredientesAgregados.length === 0) {
+        e.preventDefault();
+        alert("Debe agregar al menos un ingrediente a la receta");
+        return false;
+      }
+
+      // Asegurar que los campos ocultos estén actualizados
+      actualizarCamposOcultos();
+
+      console.log("Enviando formulario con:", {
+        nombre: nombre,
+        descripcion: document.getElementById("descripcion").value,
+        ingredientes: ingredientesAgregados,
+      });
+
+      return true;
+    });
+
+  // Inicializar
+  document.addEventListener("DOMContentLoaded", function () {
+    actualizarTabla();
+    actualizarCamposOcultos();
+  });
+</script>

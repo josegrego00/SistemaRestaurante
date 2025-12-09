@@ -1,6 +1,8 @@
 package pd.proyectomrburger.proyectomrburger.services;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import pd.proyectomrburger.proyectomrburger.mapper.RecetaMapper;
@@ -12,6 +14,7 @@ import pd.proyectomrburger.proyectomrburger.repositories.RecetaRepository;
 import pd.proyectomrburger.proyectomrburger.repositories.IngredienteRepository;
 import pd.proyectomrburger.proyectomrburger.repositories.RecetaIngredienteRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -33,15 +36,19 @@ public class RecetaService {
         Double costoTotal = calcularCostoTotal(ingredientesDTO);
         recetaGuardada.setCostoReceta(costoTotal); // Si tu entidad tiene este campo
         recetaGuardada = recetaRepository.save(recetaGuardada);
+        // 3. Crear lista de RecetaIngrediente
+        List<RecetaIngrediente> ingredientes = new ArrayList<>();
 
         // 3. Guardar los ingredientes de la receta
         for (RecetaIngredienteRequestDTO ingredienteDTO : ingredientesDTO) {
-            agregarIngredienteAReceta(
-                    recetaGuardada.getId(),
-                    ingredienteDTO.getIngredienteId(),
-                    ingredienteDTO.getCantidadNecesaria());
+            RecetaIngrediente ri = new RecetaIngrediente();
+            ri.setReceta(recetaGuardada);
+            ri.setIngrediente(ingredienteRepository.getReferenceById(ingredienteDTO.getIngredienteId()));
+            ri.setCantidadNecesaria(ingredienteDTO.getCantidadNecesaria());
+            ingredientes.add(ri);
         }
 
+        recetaIngredienteRepository.saveAll(ingredientes);
         return recetaGuardada;
     }
 
@@ -56,30 +63,6 @@ public class RecetaService {
                 .sum();
     }
 
-    // 3. AGREGAR INGREDIENTE CON VALIDACIÓN
-    public RecetaIngrediente agregarIngredienteAReceta(Long recetaId,
-            Long ingredienteId,
-            Double cantidad) {
-        Receta receta = buscarPorId(recetaId);
-        Ingrediente ingrediente = ingredienteRepository.findById(ingredienteId)
-                .orElseThrow(() -> new RuntimeException("Ingrediente no encontrado: " + ingredienteId));
-
-        // Verificar si ya existe
-        boolean existe = receta.getIngredientes().stream()
-                .anyMatch(ri -> ri.getIngrediente().getId().equals(ingredienteId));
-
-        if (existe) {
-            throw new RuntimeException("El ingrediente ya está en la receta");
-        }
-
-        RecetaIngrediente recetaIngrediente = new RecetaIngrediente();
-        recetaIngrediente.setReceta(receta);
-        recetaIngrediente.setIngrediente(ingrediente);
-        recetaIngrediente.setCantidadNecesaria(cantidad);
-
-        return recetaIngredienteRepository.save(recetaIngrediente);
-    }
-
     // 4. ACTUALIZAR RECETA COMPLETA (nombre, descripción, ingredientes)
     public Receta actualizarRecetaCompleta(Long id,
             String nombre,
@@ -92,17 +75,11 @@ public class RecetaService {
         // Limpiar ingredientes actuales
         recetaIngredienteRepository.deleteById(id);
 
-        // Agregar nuevos ingredientes
-        for (Map.Entry<Long, Double> entry : nuevosIngredientes.entrySet()) {
-            agregarIngredienteAReceta(id, entry.getKey(), entry.getValue());
-        }
-
         return recetaRepository.save(receta);
     }
 
-    public List<Receta> listarTodasConCosto() {
+    public List<Receta> listarRecetas() {
         List<Receta> recetas = recetaRepository.findAll();
-        recetas.forEach(this::calcularYCargarCostoReceta);
         return recetas;
     }
 
@@ -122,33 +99,30 @@ public class RecetaService {
         return recetaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Receta no encontrada con ID: " + id));
     }
-     private void calcularYCargarCostoReceta(Receta receta) {
+
+    private void calcularYCargarCostoReceta(Receta receta) {
         // Obtener los ingredientes de la receta
         List<RecetaIngrediente> ingredientes = recetaIngredienteRepository.findByRecetaId(receta.getId());
-        
+
         // Calcular costo total
         Double costoTotal = ingredientes.stream()
-            .mapToDouble(ri -> {
-                Ingrediente ingrediente = ri.getIngrediente();
-                return ingrediente.getCostoUnidad() * ri.getCantidadNecesaria();
-            })
-            .sum();
-        
+                .mapToDouble(ri -> {
+                    Ingrediente ingrediente = ri.getIngrediente();
+                    return ingrediente.getCostoUnidad() * ri.getCantidadNecesaria();
+                })
+                .sum();
+
         // Opción 1: Si tienes campo en entidad
         if (receta.getCostoReceta() == null) {
             receta.setCostoReceta(costoTotal);
         }
-        
-        // Opción 2: Usar un campo @Transient
-        // Necesitas agregar en tu entidad Receta:
-        // @Transient private Double costoCalculado;
-        // receta.setCostoCalculado(costoTotal);
+
     }
-    
+
     // Método para una sola receta
     public Receta obtenerRecetaConCosto(Long id) {
         Receta receta = recetaRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Receta no encontrada"));
+                .orElseThrow(() -> new RuntimeException("Receta no encontrada"));
         calcularYCargarCostoReceta(receta);
         return receta;
     }
